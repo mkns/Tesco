@@ -1,3 +1,7 @@
+p, td, th, li {
+	font-size: 10pt;
+}
+
 #header a {
 	text-decoration: none;
 }

@@ -46,21 +46,29 @@ EOQ
 }
 
 sub show_products {
+	my $data = read_datafile();
 	if ( !param("category") ) {
 		show_products_categorylist();
+		
+		my $categories = get_list_of_categories();
+		foreach my $category ( @$categories ) {
+			show_products_for_category( $data, $category );
+		}
 	}
 	else {
-		show_products_form_category();
+		my $category = param("category");
+		show_products_for_category( $data, $category );
 	}
 }
 
-sub show_products_form_category {
-	my $category      = param("category");
-	my $data          = read_datafile();
+sub show_products_for_category {
+	my ( $data, $category ) = @_;
 	my $category_data = $data->{$category};
 	my $columns       = 5;
-	print h2($category),
-	  p("<a href='/Tesco/?action=add_barcode_form&category=$category'>Add another barcode?</a>"), "\n";
+	print hr(), h2($category),
+	  p(
+"<a href='/Tesco/?action=add_barcode_form&category=$category'>Add another barcode?</a>"
+	  ), "\n";
 	print "<table cellpadding=10 cellspacing=0 border=1>\n";
 	my $counter = scalar(@$category_data) - 1;
 	foreach my $i ( 0 .. $counter ) {
@@ -74,7 +82,7 @@ sub show_products_form_category {
 			print "</tr>\n";
 		}
 	}
-	print "</table>\n"
+	print "</table>\n";
 }
 
 sub add_category {
