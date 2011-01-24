@@ -93,12 +93,12 @@ sub add_category {
 		# and write them back in.  This prevents duplicates being added.
 		my %categories = ();
 		if ( -e "files/categories.txt" ) {
-			open( FILE, "files/categories.txt" );
+			open( FILE, "files/categories.txt" ) or error("unable to open categories file: " . $!);
 			%categories = map { $_ => 1 } <FILE>;
 			close(FILE);
 		}
 		$categories{$category} = 1;
-		open( FILE, "> files/categories.txt" );
+		open( FILE, "> files/categories.txt" ) or error("unable to open categories file: " . $!);
 		foreach my $category ( sort keys %categories ) {
 			chomp($category);
 			print FILE $category, "\n";
@@ -108,7 +108,7 @@ sub add_category {
 }
 
 sub show_all_categories {
-	open( FILE, "files/categories.txt" );
+	open( FILE, "files/categories.txt" ) or error("unable to open categories file: " . $!);
 	my @categories = split( "\n", join( "", <FILE> ) );
 	close(FILE);
 	print p("Current Categories:");
@@ -116,7 +116,7 @@ sub show_all_categories {
 }
 
 sub get_list_of_categories {
-	open( FILE, "files/categories.txt" );
+	open( FILE, "files/categories.txt" ) or error("unable to open categories file: " . $!);
 	my @categories = split( "\n", join( "", <FILE> ) );
 	close(FILE);
 	return \@categories;
@@ -124,7 +124,7 @@ sub get_list_of_categories {
 
 sub get_categories_dropdown {
 	my $display_category = param("category") || "";
-	open( FILE, "files/categories.txt" );
+	open( FILE, "files/categories.txt" ) or error("unable to open categories file: " . $!);
 	my @categories = split( "\n", join( "", <FILE> ) );
 	close(FILE);
 	my $output = "<SELECT name='category'>\n";
@@ -226,7 +226,7 @@ sub generate_barcode {
 	my $png      = get_png_from_line_of_links($line);
 	$request  = GET $url . $png;
 	$response = $ua->request($request);
-	open( PNG, "> barcodes/$barcode.png" ) or die $!;
+	open( PNG, "> barcodes/$barcode.png" ) or error( $! );
 	binmode PNG;
 	print PNG $response->content();
 	close(PNG);
@@ -236,7 +236,7 @@ sub read_datafile {
 	my $categories = get_list_of_categories();
 	my %data       = map { $_ => [] } @$categories;
 	my $category   = 'Unknown';
-	open( FILE, "files/products.txt" );
+	open( FILE, "files/products.txt" ) or error( $! );
 	while ( my $line = <FILE> ) {
 		chomp($line);
 		if ( $line !~ /^\d/ ) {
@@ -261,7 +261,7 @@ sub write_datafile {
 			$output .= join( "\t", @$product ) . "\n";
 		}
 	}
-	open( FILE, "> files/products.txt" );
+	open( FILE, "> files/products.txt" ) or error( $! );
 	print FILE $output;
 	close(FILE);
 }
